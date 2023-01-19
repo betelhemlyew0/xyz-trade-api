@@ -12,8 +12,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			doc:id="f5ffca87-32d9-4234-a2a8-b2e8bf40ae0c">
 			<ee:message>
 				<ee:set-payload
-					resource="dw/transform-trades-into-ods.dwl" />		
-</ee:message>
+					resource="dw/transform-trade-into-ods.dwl" />
+			</ee:message>
 		</ee:transform>
 		<flow-ref doc:name="ods-bulk-insert-subflow"
 			doc:id="9dc3d623-a1b7-4649-a337-580bae41e1a1"
