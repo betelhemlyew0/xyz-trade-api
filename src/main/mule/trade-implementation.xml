@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="insert-trades-orchastration-subflow"
+		doc:id="c5bbebf2-6a03-4b12-85e5-10dc18449794">
+		<ee:transform doc:name="map to ODS formate"
+			doc:id="f5ffca87-32d9-4234-a2a8-b2e8bf40ae0c">
+			<ee:message>
+				<ee:set-payload
+					resource="dw/transform-trades-into-ods.dwl" />		
+</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="ods-bulk-insert-subflow"
+			doc:id="9dc3d623-a1b7-4649-a337-580bae41e1a1"
+			name="ods-bulk-insert-subflow" />
+	</sub-flow>
+</mule>

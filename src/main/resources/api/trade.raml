@@ -1,0 +1,44 @@
+#%RAML 1.0
+title: trade
+
+traits:
+  userIdTrait : !include traits/userId-header.raml
+  errorResponse : !include exchange_modules/47f58b2b-a2c2-4e84-8230-8133e240d60c/error-response/1.0.0/error-response.raml 
+
+  
+resourceTypes:
+  healthcheckResource: !include /exchange_modules/47f58b2b-a2c2-4e84-8230-8133e240d60c/resourcetype/1.0.2/resourcetype.raml
+
+types: 
+  tradeDataType: !include types/trades.raml
+  
+/trades:
+  post:
+    is: [userIdTrait, errorResponse]
+    description: create trades in to the database.
+    body:
+      application/json:
+        type: tradeDataType
+        example: !include examples/trades-request.json
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/create-trades-response.json
+  get:
+    description: to get the required data 
+    is: [userIdTrait, errorResponse]
+    queryParameters:
+      createDate:
+        type: string
+        required: true
+        maxLength: 10
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/get-trades-example.json
+
+##/healthcheck:
+  ##type: healthcheckResource
+  ##get:
