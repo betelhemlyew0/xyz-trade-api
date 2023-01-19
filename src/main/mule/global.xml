@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	   <http:listener-config name="trade-httpListenerConfig">
+        <http:listener-connection host="${http.host}" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="trade-config" api="trade.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <db:config name="Database_Config" doc:name="Database Config" doc:id="4f7c463e-f603-4e96-9e38-487b015be3c2" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${secure::db.user}" password="${secure::db.password}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="9bbdb407-a0a4-42ad-849c-a86c12dcfbf4" file="configs/${env}.properties" />
+	<global-property doc:name="Global Property" doc:id="a9ea43a5-7fc6-49d6-9c44-53b706167960" name="env" value="dev" />
+	<configuration doc:name="Configuration" doc:id="8a9f34b4-9d7d-4a78-90f6-774f338c97a7" defaultErrorHandler-ref="globalError_Handler" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="d4ae3a16-c67a-4963-a0fa-50ef7be0f78d" file="configs/${env}.secure.properties" key="${key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<error-handler name="globalError_Handler" doc:id="30237ecd-234f-4a03-8ec0-7c1367ec081b" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1ee16f46-64ba-4f0a-b8ab-645598a87047" type="DB:QUERY_EXECUTION">
+			<flow-ref doc:name="Flow Reference" doc:id="be8be981-519c-4efb-8157-5882c6e53826" name="global-error-response-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e17c8024-8cf3-4b14-9f25-564a68d6c8f1" type="DB:BAD_SQL_SYNTAX">
+			<flow-ref doc:name="Flow Reference" doc:id="2c78b5e2-0194-4403-b1fb-379f506ab113" name="global-error-response-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="82a02044-e05a-4753-97b9-b34b59d6cfca" type="ANY">
+			<flow-ref doc:name="Flow Reference" doc:id="2db90a39-9d58-4b0a-8750-7f6059462fc2" name="global-error-response-subflow"/>
+		</on-error-propagate>
+	</error-handler>
+	<sub-flow name="global-error-response-subflow" doc:id="fee19c36-85cb-4ed1-86bd-2eb47149fb1f" >
+		<ee:transform doc:name="error response" doc:id="1453be40-af43-441c-96df-f3eb1ba1c53e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status : "fail",
+	statusCode : vars.httpStatus default '500',
+	error : {
+		"type" : error.errorType.asString,
+		description: error.description,
+		detailedDescripton : error.detailedDescription
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	
+	
+	
+</mule>

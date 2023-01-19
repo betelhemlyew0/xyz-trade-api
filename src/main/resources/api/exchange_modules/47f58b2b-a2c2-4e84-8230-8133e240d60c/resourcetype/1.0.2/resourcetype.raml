@@ -1,0 +1,8 @@
+#%RAML 1.0 ResourceType
+
+/healthcheck:
+  get:
+    responses:
+      200:
+        application/json:
+          example: !include examples/healthcheckResponse.json
