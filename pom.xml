@@ -7,7 +7,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>XYYYZ-trade-api</name>
+	<name>XYYZ-trade-api</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,6 +37,7 @@
 							<artifactId>mysql-connector-java</artifactId>
 						</sharedLibrary>
 					</sharedLibraries>
+					<classifier>mule-application</classifier>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -120,6 +121,13 @@
 			<artifactId>assertions</artifactId>
 			<version>1.0.2</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>47f58b2b-a2c2-4e84-8230-8133e240d60c</groupId>
+			<artifactId>trade-api</artifactId>
+			<version>1.0.3</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 

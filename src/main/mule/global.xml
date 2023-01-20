@@ -14,7 +14,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	   <http:listener-config name="trade-httpListenerConfig">
         <http:listener-connection host="${http.host}" port="${http.port}" />
     </http:listener-config>
-    <apikit:config name="trade-config" api="trade.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="trade-config" api="trade.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" raml="api\traits\userId-header.raml">
+	</apikit:config>
     <db:config name="Database_Config" doc:name="Database Config" doc:id="4f7c463e-f603-4e96-9e38-487b015be3c2" >
 		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${secure::db.user}" password="${secure::db.password}" />
 	</db:config>
@@ -31,8 +32,12 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e17c8024-8cf3-4b14-9f25-564a68d6c8f1" type="DB:BAD_SQL_SYNTAX">
 			<flow-ref doc:name="Flow Reference" doc:id="2c78b5e2-0194-4403-b1fb-379f506ab113" name="global-error-response-subflow"/>
 		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2219787f-ccb4-41e6-9483-e9e4bbeef4f6" type="RECORD:NOT_FOUND">
+			<set-variable value="404" doc:name="httpStatus" doc:id="eda00ff6-8199-4b24-8ac6-d026eb8fd090" variableName="httpStatus"/>
+			<flow-ref doc:name="Flow Reference" doc:id="3f7c20bf-db9b-4f6c-84d6-6bf897dc2f27" name="global-error-response-subflow"/>
+		</on-error-propagate>
 		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="82a02044-e05a-4753-97b9-b34b59d6cfca" type="ANY">
-			<flow-ref doc:name="Flow Reference" doc:id="2db90a39-9d58-4b0a-8750-7f6059462fc2" name="global-error-response-subflow"/>
+			<flow-ref doc:name="Flow Reference" doc:id="2db90a39-9d58-4b0a-8750-7f6059462fc2" name="global-error-response-subflow" />
 		</on-error-propagate>
 	</error-handler>
 	<sub-flow name="global-error-response-subflow" doc:id="fee19c36-85cb-4ed1-86bd-2eb47149fb1f" >
