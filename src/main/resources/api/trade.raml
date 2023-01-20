@@ -11,6 +11,7 @@ resourceTypes:
 
 types: 
   tradeDataType: !include types/trades.raml
+  tradeIdDataType: !include types/get-trade-by-id.raml
   
 /trades:
   post:
@@ -42,3 +43,15 @@ types:
 ##/healthcheck:
   ##type: healthcheckResource
   ##get:
+  /{id}:
+    get:
+      is: [errorResponse, userIdTrait]
+      description: get trades by unique Id
+      responses:
+        200:
+          body:
+            application/json:
+              type: tradeIdDataType
+              example: !include examples/get-trades-by-id.json
+                
+      

@@ -122,6 +122,13 @@
 			<version>1.0.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>47f58b2b-a2c2-4e84-8230-8133e240d60c</groupId>
+			<artifactId>trade-api</artifactId>
+			<version>1.0.3</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
+		</dependency>
 	</dependencies>
 
 	<repositories>

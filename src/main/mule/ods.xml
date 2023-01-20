@@ -19,4 +19,12 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 }]]]></db:input-parameters>
 		</db:select>
 	</sub-flow>
+	<sub-flow name="ods-select-by-id-subflow" doc:id="c6e65ee4-41f2-4188-b6a4-63ec1e9cb934" >
+		<db:select doc:name="Select" doc:id="6822bcc6-2a72-4f6e-9aa7-a0afae2718ee" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from mulesoft.trade where id = :id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id : vars.tradeId
+}]]]></db:input-parameters>
+		</db:select>
+	</sub-flow>
 </mule>
