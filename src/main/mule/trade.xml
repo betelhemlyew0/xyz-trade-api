@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="trade-main">
+		<http:listener config-ref="trade-httpListenerConfig"
+			path="/api/*" doc:name="Accepting clients request">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router config-ref="trade-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">400
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="global-error-response-subflow"
+					doc:id="cce669d6-857a-4ead-9489-e5e9c4064764"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference"
+					doc:id="249359f5-2178-4cae-94b5-f15c59ee600d"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:METHOD_NOT_ALLOWED">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">405
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference"
+					doc:id="79f0a516-9504-469e-9df7-dbd6604c409c"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">406
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference"
+					doc:id="ef22c9fc-81f6-4a72-b785-2674cd9de5ed"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">415
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference"
+					doc:id="5f89bb33-aa25-49c1-bcb1-9cc4daa72a6e"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">501
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="Flow Reference"
+					doc:id="4f5ce83b-a37d-4819-9bb6-8ca81b27458b"
+					name="global-error-response-subflow" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="trade-console">
+		<http:listener config-ref="trade-httpListenerConfig"
+			path="/console/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console config-ref="trade-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform>
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\trades:trade-config">
+		<set-variable value="#[attributes.queryParams.createDate]" doc:name="createdDate" doc:id="b9aedf6f-8d12-4458-83b7-6a483ee47c07" variableName="createdDate"/>
+		<logger level="INFO" doc:name="Started" doc:id="9ce49971-a934-423e-8881-e79f0336c975" message="request recieved from to get trades from ods"/>
+		<flow-ref doc:name="get-trades-orchastration-subflow" doc:id="9e932f2a-22b0-43ef-9367-0d45c292b462" name="ods-select-subflow"/>
+		<ee:transform doc:name="map-to-UI-formate" doc:id="53404ec2-253e-4359-8f05-f98cf6a997ae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+	id: $.id,
+	"symbol" : $.symbol,
+	"exchange" : $.exchange,
+	"operation" : $.operation,
+	"price" : $.price,
+	"quantity" : $.quantity,
+	"status" : $.status,
+	"createdDate" : $.created_date,
+	udatedDate: $.updated_date
+	}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Completed" doc:id="45c7fb2b-9a41-4fe5-b161-0fd15be04cfa" message="request retured successfully"/>
+	</flow>
+	<flow name="post:\trades:application\json:trade-config">
+		<logger level="INFO" doc:name="Logger"
+			doc:id="e0b8e3ae-a5b7-4424-9f06-c5ef047b96cd"
+			message="request recieved to create trades" />
+		<flow-ref doc:name="insert-trades-orchastration-subflow"
+			doc:id="d3f79d4e-3896-4955-b2f2-4c509964c0ea"
+			name="insert-trades-orchastration-subflow" />
+		<ee:transform>
+			<ee:message>
+				<ee:set-payload
+					resource="dw/create-trade-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="88af3b8d-8960-4532-b423-880a401a334c"
+			message="trades created successfully" />
+	</flow>
+</mule>

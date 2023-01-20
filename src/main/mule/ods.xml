@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="ods-bulk-insert-subflow" doc:id="68ca243e-8f58-40df-b51b-d240e13c0bec" >
+		<db:bulk-insert doc:id="8a36b497-bc48-4924-8c9d-1ec96918be53" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into mulesoft.trade(exchange, symbol, operation, price, quantity, status, created_date) value(:exchange, :symbol, :operation, :price, :quantity, :status, :created_date)
+ ]]></db:sql>
+		</db:bulk-insert>
+	</sub-flow>
+	<sub-flow name="ods-select-subflow" doc:id="8ea0d61a-c471-4b02-acec-f9a9345e8b23" >
+		<db:select doc:name="Select" doc:id="3bccdf7e-798f-4989-a559-158280770e1b" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from mulesoft.trade where DATE(created_date) = :createdDate;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"createdDate" : vars.createdDate
+}]]]></db:input-parameters>
+		</db:select>
+	</sub-flow>
+</mule>
