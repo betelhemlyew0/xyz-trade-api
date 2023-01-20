@@ -161,22 +161,28 @@ output application/json
 		</error-handler>
 	</flow>
 	<flow name="get:\trades:trade-config">
-		<ee:transform>
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
+		<set-variable value="#[attributes.queryParams.createDate]" doc:name="createdDate" doc:id="b9aedf6f-8d12-4458-83b7-6a483ee47c07" variableName="createdDate"/>
+		<logger level="INFO" doc:name="Started" doc:id="9ce49971-a934-423e-8881-e79f0336c975" message="request recieved from to get trades from ods"/>
+		<flow-ref doc:name="get-trades-orchastration-subflow" doc:id="9e932f2a-22b0-43ef-9367-0d45c292b462" name="ods-select-subflow"/>
+		<ee:transform doc:name="map-to-UI-formate" doc:id="53404ec2-253e-4359-8f05-f98cf6a997ae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-[
-  {
-    code: "AAPL",
-    exchange: "NYSE",
-    operation: "buy",
-    price: 136.76,
-    quantity: 20
-  }
-]]]></ee:set-payload>
+payload map {
+	id: $.id,
+	"symbol" : $.symbol,
+	"exchange" : $.exchange,
+	"operation" : $.operation,
+	"price" : $.price,
+	"quantity" : $.quantity,
+	"status" : $.status,
+	"createdDate" : $.created_date,
+	udatedDate: $.updated_date
+	}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Completed" doc:id="45c7fb2b-9a41-4fe5-b161-0fd15be04cfa" message="request retured successfully"/>
 	</flow>
 	<flow name="post:\trades:application\json:trade-config">
 		<logger level="INFO" doc:name="Logger"
