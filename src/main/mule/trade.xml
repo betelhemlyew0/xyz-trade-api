@@ -10,7 +10,7 @@
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="trade-main">
 		<http:listener config-ref="trade-httpListenerConfig"
-			path="/api/*">
+			path="/api/*" doc:name="Accepting clients request">
 			<http:response
 				statusCode="#[vars.httpStatus default 200]">
 				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
