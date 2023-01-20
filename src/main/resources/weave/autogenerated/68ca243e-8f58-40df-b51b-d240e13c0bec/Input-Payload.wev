@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_68ca243e_8f58_40df_b51b_d240e13c0bec_Input_Payload = Array<{|  symbol: String,   exchange: String,   operation: "sell" | "buy",   price: Number,   quantity: Number,   status: String,   created_date: String {"format": "yyyy-MM-dd HH:mm:ss"}|}>
+
